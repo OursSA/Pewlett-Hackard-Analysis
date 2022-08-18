@@ -70,6 +70,13 @@ ON ce.emp_no = de.emp_no
 GROUP BY de.dept_no
 ORDER BY de.dept_no;
 
+SELECT rd.count, rd.dept_no, d.dept_name
+FROM retiring_departments as rd
+JOIN departments AS d
+ON rd.dept_no = d.dept_no
+ORDER BY rd.count DESC;
+
+
 --New table: Employee Info
 SELECT e.emp_no, 
 	e.first_name, 
@@ -160,7 +167,6 @@ SELECT DISTINCT ON (emp_no) emp_no,
 first_name,
 last_name,
 title
-
 INTO unique_titles
 FROM retirement_titles
 WHERE (to_date = '9999-01-01')
@@ -191,3 +197,45 @@ ON (e.emp_no = t.emp_no)
 WHERE (de.to_date = '9999-01-01')
 AND (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
 ORDER BY emp_no
+
+SELECT COUNT (emp_no)
+FROM unique_titles;
+
+SELECT COUNT (emp_no)
+FROM current_emp;
+
+--New table: All Active
+SELECT e.emp_no, 
+	e.first_name, 
+	e.last_name, 
+	e.gender, 
+	de.to_date, 
+	s.salary
+INTO active_emp
+FROM employees as e
+INNER JOIN salaries as s
+ON (e.emp_no = s.emp_no)
+INNER JOIN dept_emp as de
+ON (e.emp_no = de.emp_no)
+WHERE (de.to_date = '9999-01-01');
+
+select * from active_emp;
+select count(emp_no) from active_emp;
+
+SELECT ae.emp_no,
+	ae.first_name,
+	ae.last_name,
+	ae.to_date,
+	de.dept_no,
+	d.dept_name
+INTO active_depts
+FROM active_emp AS ae
+INNER JOIN dept_emp AS de
+ON (ae.emp_no = de.emp_no)
+INNER JOIN departments as d
+ON (de.dept_no = d.dept_no);
+
+SELECT * from active_depts;
+SELECT dept_name, COUNT (dept_name)
+FROM active_depts
+GROUP BY dept_name;
